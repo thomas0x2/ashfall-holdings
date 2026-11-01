@@ -1,0 +1,28 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ashfall", "Ashfall.csproj", "{8E1C4F7A-3B2D-4C5E-9A6F-1D2E3F4A5B6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ashfall.Sim", "..\sim\Ashfall.Sim.csproj", "{2A7B9C1D-4E5F-4A6B-8C7D-9E0F1A2B3C4D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		ExportDebug|Any CPU = ExportDebug|Any CPU
+		ExportRelease|Any CPU = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8E1C4F7A-3B2D-4C5E-9A6F-1D2E3F4A5B6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E1C4F7A-3B2D-4C5E-9A6F-1D2E3F4A5B6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E1C4F7A-3B2D-4C5E-9A6F-1D2E3F4A5B6C}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{8E1C4F7A-3B2D-4C5E-9A6F-1D2E3F4A5B6C}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{8E1C4F7A-3B2D-4C5E-9A6F-1D2E3F4A5B6C}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{8E1C4F7A-3B2D-4C5E-9A6F-1D2E3F4A5B6C}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{2A7B9C1D-4E5F-4A6B-8C7D-9E0F1A2B3C4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A7B9C1D-4E5F-4A6B-8C7D-9E0F1A2B3C4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A7B9C1D-4E5F-4A6B-8C7D-9E0F1A2B3C4D}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A7B9C1D-4E5F-4A6B-8C7D-9E0F1A2B3C4D}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{2A7B9C1D-4E5F-4A6B-8C7D-9E0F1A2B3C4D}.ExportRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{2A7B9C1D-4E5F-4A6B-8C7D-9E0F1A2B3C4D}.ExportRelease|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
