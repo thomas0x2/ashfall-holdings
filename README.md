@@ -21,6 +21,8 @@ Requirements: [Godot 4.7 .NET edition](https://godotengine.org/download) and the
 1. Open Godot, choose **Import**, and pick `game/project.godot`.
 2. Press **Build** (hammer icon, top right), then **Run** (F5).
 
+**"Main.tscn can't be opened" / missing dependency `Main.cs`:** you're almost certainly on the standard Godot download, which can't read C# scripts. Download the **.NET** build of the same version (it's a separate download on the Godot site, labelled ".NET"), then import the project again. The standard build also warns that the project uses the unsupported "C#" feature.
+
 Tests, from the repo root:
 
 ```sh
