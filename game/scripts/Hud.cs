@@ -77,7 +77,7 @@ public partial class Hud : CanvasLayer
         foreach (var r in Enum.GetValues<Resource>())
             sb.Append($"{r}: {sim.Stockpile[r]}    ");
         int alive = sim.Settlers.Count(s => !s.IsDead);
-        sb.Append($"\nSettlers: {alive}");
+        sb.Append($"\nSettlers: {alive}    FPS: {Engine.GetFramesPerSecond():0}");
         if (buildMode is { } b)
             sb.Append($"\nBuilding: {b.Name} ({string.Join(", ", b.Cost.Select(kv => $"{kv.Value} {kv.Key}"))}). {b.Description}");
         _status.Text = sb.ToString();

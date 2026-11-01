@@ -18,7 +18,7 @@ public partial class Main : Node2D
     private const int MaxTicksPerFrame = 600;
 
     private Simulation _sim = null!;
-    private MapView _map = null!;
+    private MapLayer _map = null!;
     private SettlerView _settlers = null!;
     private CameraRig _camera = null!;
     private Hud _hud = null!;
@@ -27,6 +27,7 @@ public partial class Main : Node2D
     private bool _paused;
     private int _speed = 1;
     private double _tickAccumulator;
+    private double _hudTimer;
     private int _buildIndex = -1;
     private Settler? _selected;
 
@@ -36,7 +37,7 @@ public partial class Main : Node2D
     {
         _sim = new Simulation(Seed, MapSize);
 
-        _map = new MapView { Name = "Map" };
+        _map = new MapLayer { Name = "Map" };
         AddChild(_map);
         _map.Init(_sim);
 
@@ -83,7 +84,13 @@ public partial class Main : Node2D
         _settlers.Hovered = Iso.ToGrid(GetGlobalMousePosition());
         _settlers.BuildPreview = BuildMode;
         _settlers.Selected = _selected;
-        _hud.Refresh(_sim, _paused, _speed, BuildMode, _selected);
+        // Text layout is expensive; ten updates a second reads as live.
+        _hudTimer -= delta;
+        if (_hudTimer <= 0)
+        {
+            _hudTimer = 0.1;
+            _hud.Refresh(_sim, _paused, _speed, BuildMode, _selected);
+        }
     }
 
     public override void _UnhandledInput(InputEvent e)
