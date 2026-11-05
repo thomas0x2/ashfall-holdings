@@ -41,6 +41,15 @@ dotnet test tests/Ashfall.Sim.Tests
 | WASD, arrows, middle drag | Pan camera |
 | Mouse wheel | Zoom |
 | P | Toggle the oil-paint filter |
+| Tab | Show or hide the settler roster |
+
+## Interface
+
+- **Top bar:** settlement, day and time, every resource with its change over the last in-game hour (hover for targets), speed buttons, and a `?` with all controls.
+- **Settler roster** (left): each settler's activity, hunger, rest, health, and mood. Click a row to select them and jump the camera there.
+- **Settler card** (right): backstory, traits, skills, and live needs for the selected settler.
+- **Build bar** (bottom): every building with its cost. Unaffordable ones are greyed out; hover for details.
+- **Chronicle** (bottom left): the event log.
 
 ## Art direction
 
