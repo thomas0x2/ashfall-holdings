@@ -95,15 +95,7 @@ public partial class SettlerView : Node2D
         DrawPolyline(new[] { d[0], d[1], d[2], d[3], d[0] }, Palette.Bone with { A = 0.7f }, 1.5f);
     }
 
-    private static Color CarryColor(Resource r) => r switch
-    {
-        Resource.Scrap => Palette.Rust,
-        Resource.Wood => Palette.DeadWood.Lightened(0.2f),
-        Resource.Food => Palette.Sage,
-        Resource.Water => Palette.SpringBlue,
-        Resource.Medicine => Palette.Bone,
-        _ => Palette.Bone,
-    };
+    private static Color CarryColor(Resource r) => Palette.For(r);
 
     public Settler? SettlerAt(GridPos p) =>
         _sim.Settlers.Where(s => !s.IsDead).FirstOrDefault(s => s.Position == p)

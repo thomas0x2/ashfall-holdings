@@ -21,6 +21,9 @@ public sealed class Simulation
     public const int JobSearchRetryTicks = 30;
     public const int MaxPathNodes = 6000;
 
+    /// <summary>Stock levels settlers try to keep. They stop gathering a resource at twice its target.</summary>
+    public static IReadOnlyDictionary<Resource, int> StockTargets => Targets;
+
     private static readonly Dictionary<Resource, int> Targets = new()
     {
         [Resource.Food] = 30,

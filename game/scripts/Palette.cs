@@ -41,6 +41,29 @@ public static class Palette
         _ => Dirt,
     };
 
+    public static Color For(Resource r) => r switch
+    {
+        Resource.Scrap => Rust,
+        Resource.Wood => DeadWood.Lightened(0.2f),
+        Resource.Food => Sage,
+        Resource.Water => SpringBlue,
+        Resource.Medicine => Bone,
+        _ => Bone,
+    };
+
+    // UI colours: dark umber panels, parchment text, ochre accents.
+    public static readonly Color UiPanel = new(0.13f, 0.10f, 0.08f, 0.92f);
+    public static readonly Color UiBorder = new(0.55f, 0.42f, 0.26f, 0.9f);
+    public static readonly Color UiText = new(0.92f, 0.87f, 0.76f);
+    public static readonly Color UiMuted = new(0.66f, 0.60f, 0.50f);
+    public static readonly Color UiAccent = new(0.82f, 0.60f, 0.29f);
+    public static readonly Color UiButton = new(0.22f, 0.17f, 0.13f);
+    public static readonly Color UiButtonHover = new(0.30f, 0.23f, 0.17f);
+    public static readonly Color UiButtonPressed = new(0.42f, 0.29f, 0.16f);
+    public static readonly Color UiGood = new(0.66f, 0.76f, 0.48f);
+    public static readonly Color UiWarn = new(0.88f, 0.71f, 0.36f);
+    public static readonly Color UiBad = new(0.88f, 0.48f, 0.37f);
+
     /// <summary>Deterministic per-tile variation so the ground looks hand-painted, not tiled.</summary>
     public static Color Vary(Color c, GridPos p, int salt, float amount)
     {

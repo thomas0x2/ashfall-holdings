@@ -28,10 +28,10 @@ public partial class Main : Node2D
     private int _speed = 1;
     private double _tickAccumulator;
     private double _hudTimer;
-    private int _buildIndex = -1;
+    private BuildingType? _buildMode;
     private Settler? _selected;
 
-    private BuildingType? BuildMode => _buildIndex >= 0 ? BuildingCatalog.All[_buildIndex] : null;
+    private BuildingType? BuildMode => _buildMode;
 
     public override void _Ready()
     {
@@ -53,6 +53,10 @@ public partial class Main : Node2D
 
         _hud = new Hud { Name = "Hud" };
         AddChild(_hud);
+        _hud.Init(_sim);
+        _hud.BuildPicked += type => { _buildMode = type; if (type is not null) _selected = null; };
+        _hud.SpeedPicked += speed => { if (speed == 0) _paused = true; else SetSpeed(speed); };
+        _hud.SettlerPicked += Select;
     }
 
     /// <summary>A full-screen pass that turns the flat render into something that looks oil-painted.</summary>
@@ -89,7 +93,7 @@ public partial class Main : Node2D
         if (_hudTimer <= 0)
         {
             _hudTimer = 0.1;
-            _hud.Refresh(_sim, _paused, _speed, BuildMode, _selected);
+            _hud.Refresh(_paused, _speed, BuildMode, _selected);
         }
     }
 
@@ -103,8 +107,9 @@ public partial class Main : Node2D
                 case Key.Key1: SetSpeed(1); break;
                 case Key.Key2: SetSpeed(2); break;
                 case Key.Key3: SetSpeed(3); break;
-                case Key.B: _buildIndex = (_buildIndex + 1) % BuildingCatalog.All.Count; break;
-                case Key.Escape: _buildIndex = -1; _selected = null; break;
+                case Key.B: CycleBuildMode(); break;
+                case Key.Tab: _hud.ToggleRoster(); break;
+                case Key.Escape: _buildMode = null; _selected = null; break;
                 case Key.P:
                     bool on = (bool)_paint.GetShaderParameter("enabled");
                     _paint.SetShaderParameter("enabled", !on);
@@ -130,13 +135,34 @@ public partial class Main : Node2D
                 {
                     _selected = _settlers.SettlerAt(tile);
                 }
+                _hudTimer = 0;
                 GetViewport().SetInputAsHandled();
             }
             else if (mb.ButtonIndex == MouseButton.Right)
             {
-                _buildIndex = -1;
+                _buildMode = null;
                 GetViewport().SetInputAsHandled();
             }
+        }
+    }
+
+    private void CycleBuildMode()
+    {
+        var all = BuildingCatalog.All;
+        int i = _buildMode is null ? -1 : all.ToList().IndexOf(_buildMode);
+        _buildMode = all[(i + 1) % all.Count];
+        _selected = null;
+    }
+
+    /// <summary>Select a settler (or nothing) and bring them into view.</summary>
+    private void Select(Settler? s)
+    {
+        _selected = s;
+        _hudTimer = 0;
+        if (s is not null)
+        {
+            _buildMode = null;
+            _camera.Position = Iso.ToScreen(s.Position);
         }
     }
 
