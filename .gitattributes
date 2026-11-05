@@ -1,0 +1,5 @@
+# Normalize line endings so Godot and git agree on every OS.
+* text=auto eol=lf
+*.sln text eol=crlf
+*.png binary
+*.svg text

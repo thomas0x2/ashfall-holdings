@@ -1,7 +1,6 @@
-# Godot
+# Godot: the .godot/ cache is rebuilt on every machine. Keep *.import and *.uid
+# files committed; Godot needs them to keep resource IDs stable.
 .godot/
-*.import
-export_presets.cfg
 export/
 
 # .NET
