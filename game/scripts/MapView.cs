@@ -4,30 +4,33 @@ using Resource = Ashfall.Sim.Resource;
 
 namespace Ashfall.Game;
 
-/// <summary>
-/// Draws terrain, deposits, and buildings. Redrawn only when the map changes, because it is
-/// thousands of polygons; per-frame things (settlers, hover) live on other nodes.
-/// </summary>
+/// <summary>Draws terrain, deposits, buildings, and the camp for one block of tiles.</summary>
 public partial class MapView : Node2D
 {
     private Simulation _sim = null!;
+    private int _cx, _cy;
 
-    public void Init(Simulation sim)
+    public void Init(Simulation sim, int chunkX, int chunkY)
     {
         _sim = sim;
-        sim.MapChanged += QueueRedraw;
+        _cx = chunkX;
+        _cy = chunkY;
         QueueRedraw();
     }
+
+    private bool InChunk(GridPos p) => p.X / MapLayer.ChunkSize == _cx && p.Y / MapLayer.ChunkSize == _cy;
 
     public override void _Draw()
     {
         if (_sim is null) return;
         var map = _sim.Map;
+        int x0 = _cx * MapLayer.ChunkSize, y0 = _cy * MapLayer.ChunkSize;
+        int x1 = Math.Min(map.Width, x0 + MapLayer.ChunkSize) - 1, y1 = Math.Min(map.Height, y0 + MapLayer.ChunkSize) - 1;
 
-        // Draw back to front so raised things (rocks, buildings) overlap correctly.
-        for (int sum = 0; sum <= map.Width + map.Height - 2; sum++)
+        // Back to front within the block.
+        for (int sum = x0 + y0; sum <= x1 + y1; sum++)
         {
-            for (int x = Math.Max(0, sum - map.Height + 1); x <= Math.Min(sum, map.Width - 1); x++)
+            for (int x = Math.Max(x0, sum - y1); x <= Math.Min(x1, sum - y0); x++)
             {
                 var p = new GridPos(x, sum - x);
                 ref var tile = ref map[p];
@@ -36,10 +39,10 @@ public partial class MapView : Node2D
             }
         }
 
-        foreach (var b in _sim.Buildings.OrderBy(b => b.Origin.X + b.Origin.Y))
+        foreach (var b in _sim.Buildings.Where(b => InChunk(b.Origin)).OrderBy(b => b.Origin.X + b.Origin.Y))
             DrawBuilding(b);
 
-        DrawCamp();
+        if (InChunk(_sim.Camp)) DrawCamp();
     }
 
     private void DrawGround(GridPos p, Terrain t)
@@ -49,7 +52,7 @@ public partial class MapView : Node2D
 
         // Two or three loose "dabs" per tile: the shader smears these into brushwork.
         var c = Iso.ToScreen(p);
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 2; i++)
         {
             float hx = (float)ValueNoise.Hash(p.X, p.Y, 100 + i) - 0.5f;
             float hy = (float)ValueNoise.Hash(p.X, p.Y, 200 + i) - 0.5f;

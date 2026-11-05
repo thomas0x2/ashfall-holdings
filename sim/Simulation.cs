@@ -18,6 +18,8 @@ public sealed class Simulation
     public const double WorkPerUnit = 15;
     public const int CarryCapacity = 5;
     public const int MealTicks = 20;
+    public const int JobSearchRetryTicks = 30;
+    public const int MaxPathNodes = 6000;
 
     private static readonly Dictionary<Resource, int> Targets = new()
     {
@@ -39,6 +41,8 @@ public sealed class Simulation
     private readonly List<Building> _buildings = new();
     private readonly List<GridPos> _deposits;
     private readonly HashSet<GridPos> _reserved = new();
+    // Deposits no path reaches. Nothing ever opens terrain up, so once unreachable, always unreachable.
+    private readonly HashSet<GridPos> _unreachable = new();
     private int _nextBuildingId = 1;
 
     public IReadOnlyList<Settler> Settlers => _settlers;
@@ -49,8 +53,8 @@ public sealed class Simulation
     public int Minute => (int)(CurrentTick % TicksPerHour);
     public bool IsNight => Hour >= 22 || Hour < 6;
 
-    /// <summary>Raised whenever tiles change in a way the renderer should redraw (building placed, deposit gone).</summary>
-    public event Action? MapChanged;
+    /// <summary>Raised for each tile that changes in a way the renderer should redraw (building placed, deposit gone).</summary>
+    public event Action<GridPos>? TileChanged;
 
     public Simulation(int seed, int mapSize = 128, int settlerCount = 5, string settlementName = "First Light")
     {
@@ -110,10 +114,10 @@ public sealed class Simulation
             ref var t = ref Map[p];
             t.BuildingId = building.Id;
             t.Blocked = type.BlocksMovement;
+            TileChanged?.Invoke(p);
         }
 
         Log.Add(CurrentTick, LogKind.Good, $"Built a {type.Name}. {type.Description}");
-        MapChanged?.Invoke();
         return PlaceResult.Ok;
     }
 
@@ -214,7 +218,9 @@ public sealed class Simulation
             return;
         }
 
-        if (TryStartGatherJob(s)) return;
+        if (s.JobSearchCooldown > 0) s.JobSearchCooldown--;
+        else if (TryStartGatherJob(s)) return;
+        else s.JobSearchCooldown = JobSearchRetryTicks;
 
         // Nothing to do: wander one step so the colony doesn't look frozen.
         if (CurrentTick % 30 == s.Id % 30)
@@ -239,13 +245,17 @@ public sealed class Simulation
             if (Stockpile[r] >= Targets[r] * 2) continue;
 
             var candidates = _deposits
-                .Where(p => Map[p].Deposit == r && Map[p].DepositAmount > 0 && !_reserved.Contains(p))
+                .Where(p => Map[p].Deposit == r && Map[p].DepositAmount > 0 && !_reserved.Contains(p) && !_unreachable.Contains(p))
                 .OrderBy(p => p.ManhattanTo(s.Position))
                 .Take(4);
 
             foreach (var target in candidates)
             {
-                if (!TryWalkTo(s, target)) continue;
+                if (!TryWalkTo(s, target))
+                {
+                    _unreachable.Add(target);
+                    continue;
+                }
                 _reserved.Add(target);
                 s.TargetDeposit = target;
                 s.Activity = SettlerActivity.WalkingToDeposit;
@@ -257,7 +267,7 @@ public sealed class Simulation
 
     private bool TryWalkTo(Settler s, GridPos goal)
     {
-        var path = Pathfinder.FindPath(Map, s.Position, goal);
+        var path = Pathfinder.FindPath(Map, s.Position, goal, MaxPathNodes);
         if (path is null) return false;
         s.Path.Clear();
         foreach (var p in path) s.Path.Enqueue(p);
@@ -319,7 +329,7 @@ public sealed class Simulation
             tile.Deposit = null;
             _deposits.Remove(p);
             Log.Add(CurrentTick, LogKind.Warning, DepletedLine(s, r));
-            MapChanged?.Invoke();
+            TileChanged?.Invoke(p);
         }
 
         if (s.CarryAmount >= CarryCapacity || exhausted)

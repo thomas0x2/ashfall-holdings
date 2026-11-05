@@ -64,6 +64,8 @@ public sealed class Settler
     public int CarryAmount { get; internal set; }
     internal double WorkProgress { get; set; }
     internal int MoveCooldown { get; set; }
+    /// <summary>Ticks to wait before looking for work again after finding none.</summary>
+    internal int JobSearchCooldown { get; set; }
 
     public string DisplayName => Nickname is null ? $"{FirstName} {LastName}" : $"{FirstName} \"{Nickname}\" {LastName}";
     public string ShortName => Nickname ?? FirstName;
